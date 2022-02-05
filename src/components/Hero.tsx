@@ -22,7 +22,7 @@ const Hero = (): JSX.Element => {
           </button>
         </div>
 
-        <div className="lg:flex-1 h-full transform translate-x-24 lg:translate-x-32 relative">
+        <div className="lg:flex-1 h-full transform translate-x-10 lg:translate-x-32 relative">
           <img
             src="/images/illustration-working.svg"
             alt="hero"

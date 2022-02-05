@@ -10,7 +10,7 @@ const Header = (): JSX.Element => {
   };
 
   return (
-    <div className="fixed bg-white fixed left-0 right-0 z-30">
+    <div className="fixed bg-white  left-0 right-0 z-30">
       <Container className=" flex h-[112px] items-center   bg-white ">
         <img src="/images/logo.svg" alt="logo" />
         <ul className="lg:flex space-x-5 ml-10  text-base hidden">
@@ -44,9 +44,9 @@ const Header = (): JSX.Element => {
             onClick={handleSidebarOpen}
           >
             <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M4 6h16M4 12h16M4 18h16"
             />
           </svg>

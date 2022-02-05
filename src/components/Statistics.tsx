@@ -3,17 +3,61 @@ import Card from "./Card";
 import ShortLink from "./ShortLink";
 import Container from "./Container";
 
+import axios from "axios";
+import { Shortener } from "../types/Shortener";
+import { ShortenObject } from "../types/ShortenObject";
+import useCopyToClipboard from "../hooks/useCopyToClipboard";
+
 const Statistics = (): JSX.Element => {
-  const [isError, setIsError] = useState(false);
-  const [url, setUrl] = useState("");
+  const [isError, setIsError] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [url, setUrl] = useState<string>("");
+  const [shortenUrl, setShortenUrl] = useState<ShortenObject[]>([]);
+  const [isFetch, setIsFetch] = useState<boolean>(false);
+
+  const [isCopied, handleCopy] = useCopyToClipboard(3000);
 
   const onShortenClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     if (!url) {
+      setErrorMessage("Please add link");
       setIsError(true);
-    } else {
-      setIsError(false);
+      setTimeout(() => {
+        setErrorMessage("");
+        setIsError(false);
+      }, 5000);
+      return;
     }
+
+    setIsFetch(true);
+    axios
+      .get<Shortener>("https://api.shrtco.de/v2/shorten?url=" + url)
+      .then((res) => {
+        setShortenUrl([
+          ...shortenUrl,
+          {
+            id: shortenUrl.length,
+            code: res.data.result.code,
+            full_short_link: res.data.result.full_short_link,
+            original_link: res.data.result.original_link,
+          },
+        ]);
+
+        setErrorMessage("");
+        setIsError(false);
+        setUrl("");
+        setIsFetch(false);
+      })
+      .catch((e) => {
+        setErrorMessage(e.response.data.error);
+        setIsError(true);
+        setUrl("");
+        setIsFetch(false);
+        setTimeout(() => {
+          setErrorMessage("");
+          setIsError(false);
+        }, 5000);
+      });
   };
 
   return (
@@ -49,22 +93,31 @@ const Statistics = (): JSX.Element => {
                   isError ? "visible" : "invisible"
                 }`}
               >
-                Please add a link
+                {errorMessage}
               </p>
             </div>
             <button
-              className="bg-primary-cyan font-bold text-white px-5 py-2 text-base rounded-md ml-0 md:ml-5"
+              className={`${
+                isFetch ? "bg-[#9be3e2]" : "bg-primary-cyan"
+              } font-bold text-white px-5 py-2 text-base rounded-md ml-0 md:ml-5`}
+              disabled={isFetch ? true : false}
               onClick={onShortenClick}
             >
-              Shorten It!
+              {isFetch ? "Generating" : "Shorten It!"}
             </button>
             {/* <input type="text" className="md:flex-1" /> */}
           </div>
         </Container>
         <Container className=" flex flex-col space-y-5 ">
-          <ShortLink />
-          <ShortLink />
-          <ShortLink />
+          {shortenUrl.map((url) => (
+            <ShortLink
+              original_link={url.original_link}
+              full_link={url.full_short_link}
+              isCopied={isCopied}
+              handleCopy={handleCopy}
+              key={url.id}
+            />
+          ))}
         </Container>
       </div>
 
@@ -73,6 +126,7 @@ const Statistics = (): JSX.Element => {
           <h1 className="text-4xl font-bold text-neutral-very-dark-violet mb-2 text-center">
             Advanced Statistics
           </h1>
+
           <p className="text-center mt-5">
             Track how your links are performing across the web with <br /> our
             advanced statistics dashboard
