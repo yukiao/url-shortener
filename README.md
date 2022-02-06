@@ -37,7 +37,7 @@ Users should be able to:
 
 ### Links
 
-<!-- - Solution URL: [Add solution URL here](https://your-solution-url.com) -->
+- Solution URL: [Frontend Mentor](https://www.frontendmentor.io/solutions/responsive-landing-page-using-flexbox-labLLmHuU)
 
 - Live Site URL: [url-shortener](https://url-shortener-puce.vercel.app/)
 
