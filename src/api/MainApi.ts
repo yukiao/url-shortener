@@ -1,5 +1,5 @@
 import HttpClient from "./http-client";
-import { Shortener } from "../types/Shortener";
+import Shortener from "shortener";
 
 class MainApi extends HttpClient {
   private static classInstance?: MainApi;

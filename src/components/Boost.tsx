@@ -1,4 +1,7 @@
-const Boost = (): JSX.Element => {
+interface BoostProp {
+  onGetStartedClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}
+const Boost = ({ onGetStartedClick }: BoostProp): JSX.Element => {
   return (
     <div className="bg-[#3a3053] relative">
       <img
@@ -15,7 +18,10 @@ const Boost = (): JSX.Element => {
         <h1 className="font-bold text-white text-2xl md:text-4xl">
           Boost your links today
         </h1>
-        <button className="text-sm md:text-base font-bold text-white bg-primary-cyan py-2 px-7 mt-5 rounded-full">
+        <button
+          className="text-sm md:text-base font-bold text-white bg-primary-cyan py-2 px-7 mt-5 rounded-full"
+          onClick={onGetStartedClick}
+        >
           Get Started
         </button>
       </div>

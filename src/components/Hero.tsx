@@ -1,6 +1,10 @@
 import Container from "./Container";
 
-const Hero = (): JSX.Element => {
+interface HeroProp {
+  onGetStartedClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+const Hero = ({ onGetStartedClick }: HeroProp): JSX.Element => {
   return (
     <div
       style={{
@@ -17,7 +21,10 @@ const Hero = (): JSX.Element => {
             Build your brand's recognition and get detailed insights on how your
             links are performing.
           </p>
-          <button className="mt-10 px-5 py-3 rounded-full bg-primary-cyan text-white text-base font-bold cursor-pointer mx-auto self-start lg:mx-0">
+          <button
+            className="mt-10 px-5 py-3 rounded-full bg-primary-cyan text-white text-base font-bold cursor-pointer mx-auto self-start lg:mx-0"
+            onClick={onGetStartedClick}
+          >
             Get Started
           </button>
         </div>

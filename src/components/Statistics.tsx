@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Card from "./Card";
 import ShortLink from "./ShortLink";
 import Container from "./Container";
-
-import axios from "axios";
-import { Shortener } from "../types/Shortener";
-import { ShortenObject } from "../types/ShortenObject";
+import ShortenObject from "shorten-object";
 import useCopyToClipboard from "../hooks/useCopyToClipboard";
+import shortenSubmit from "../handlers/onShortenClick";
 
-const Statistics = (): JSX.Element => {
+interface StatisticsProps {
+  inputRef: React.RefObject<HTMLInputElement>;
+}
+
+const Statistics = ({ inputRef }: StatisticsProps): JSX.Element => {
   const [isError, setIsError] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [url, setUrl] = useState<string>("");
@@ -17,48 +19,31 @@ const Statistics = (): JSX.Element => {
 
   const [isCopied, handleCopy] = useCopyToClipboard(3000);
 
-  const onShortenClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (!url) {
-      setErrorMessage("Please add link");
-      setIsError(true);
-      setTimeout(() => {
-        setErrorMessage("");
-        setIsError(false);
-      }, 5000);
-      return;
+  const onShortenSubmit = shortenSubmit(
+    url,
+    shortenUrl,
+    setUrl,
+    setShortenUrl,
+    setErrorMessage,
+    setIsError,
+    setIsFetch
+  );
+
+  function fetchShorten(): void {
+    let shortenUrlArray: ShortenObject[];
+    const shortenStringify = window.localStorage.getItem("shortenUrl");
+    if (!shortenStringify) {
+      shortenUrlArray = [];
+    } else {
+      shortenUrlArray = JSON.parse(shortenStringify);
     }
 
-    setIsFetch(true);
-    axios
-      .get<Shortener>("https://api.shrtco.de/v2/shorten?url=" + url)
-      .then((res) => {
-        setShortenUrl([
-          ...shortenUrl,
-          {
-            id: shortenUrl.length,
-            code: res.data.result.code,
-            full_short_link: res.data.result.full_short_link,
-            original_link: res.data.result.original_link,
-          },
-        ]);
+    setShortenUrl(shortenUrlArray);
+  }
 
-        setErrorMessage("");
-        setIsError(false);
-        setUrl("");
-        setIsFetch(false);
-      })
-      .catch((e) => {
-        setErrorMessage(e.response.data.error);
-        setIsError(true);
-        setUrl("");
-        setIsFetch(false);
-        setTimeout(() => {
-          setErrorMessage("");
-          setIsError(false);
-        }, 5000);
-      });
-  };
+  useEffect(() => {
+    fetchShorten();
+  }, []);
 
   return (
     <>
@@ -74,7 +59,10 @@ const Statistics = (): JSX.Element => {
             alt="shorten-mobile"
             className="w-full rounded-md md:hidden"
           />
-          <div className="flex flex-col md:flex-row absolute w-10/12 lg:mx-0 lg:w-11/12 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ">
+          <form
+            className="flex flex-col md:flex-row absolute w-10/12 lg:mx-0 lg:w-11/12 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 "
+            onSubmit={onShortenSubmit}
+          >
             <div className="flex flex-col md:flex-1 ">
               <input
                 type="text"
@@ -87,6 +75,7 @@ const Statistics = (): JSX.Element => {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setUrl(e.target.value)
                 }
+                ref={inputRef}
               />
               <p
                 className={`   text-secondary-red md:font-bold italic my-3 md:absolute top-full md:mt-1 text-sm md:text-base  lg:mt-3 ${
@@ -99,14 +88,13 @@ const Statistics = (): JSX.Element => {
             <button
               className={`${
                 isFetch ? "bg-[#9be3e2]" : "bg-primary-cyan"
-              } font-bold text-white px-5 py-2 text-base rounded-md ml-0 md:ml-5`}
+              } font-bold text-white px-5 py-2 text-base rounded-md ml-0 md:ml-5 lg:py-5`}
               disabled={isFetch ? true : false}
-              onClick={onShortenClick}
+              type="submit"
             >
               {isFetch ? "Generating" : "Shorten It!"}
             </button>
-            {/* <input type="text" className="md:flex-1" /> */}
-          </div>
+          </form>
         </Container>
         <Container className=" flex flex-col space-y-5 ">
           {shortenUrl.map((url) => (
